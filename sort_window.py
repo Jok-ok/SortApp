@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton, QDesktopWidget, QComboBox,
 import logic
 from table_window import TableWindow
 
+start_window = None
 table_window = None
 word_count = 1
 sort_type = "max"
@@ -54,7 +55,10 @@ def set_label_value(label, value):
     label.setText(str(value))
 
 
-def SortWindow(df):
+def SortWindow(back_window, df):
+    global start_window
+    start_window = back_window
+
     window = QMainWindow()
 
     window.setWindowTitle("Super sort app")

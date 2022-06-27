@@ -23,7 +23,7 @@ def choose_file(window):
 
     if filepath:
         df = get_data_from_xlsx(filepath)
-        sort_window = SortWindow(df)
+        sort_window = SortWindow(window, df)
         sort_window.show()
         window.close()
 
