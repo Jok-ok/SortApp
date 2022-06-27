@@ -12,31 +12,46 @@ def delete_header_row(df):
     return df_without_header_row
 
 
-def get_client_sentences(df, index):
+def get_sentences(df, index):
     original_dialogs = df[index].tolist()
+    original_dialogs = list(map(lambda d: str(d), original_dialogs))
 
-    dialogs = []
+    sentences = []
 
     for text in original_dialogs:
         client_dialogs = re.findall(r'CLIENT:(.+?)BOT:', text + "BOT:", re.DOTALL)
-        delimiter_chars = ['?', '!', '.', '\n', 'CLIENT:']
 
-        for client_dialog in client_dialogs:
-            filtered_dialog = client_dialog
+        if len(client_dialogs) == 0:
+            sentences.append(text)
+        else:
+            client_dialogs = get_client_dialogs(client_dialogs)
 
-            for char in delimiter_chars:
-                filtered_dialog = filtered_dialog.replace(char, ".")
+            for dialog in client_dialogs:
+                client_sentences = dialog.split(".")
+                sentences = sentences + client_sentences
 
-            filtered_dialog = filtered_dialog.strip()
-            filtered_dialog = re.sub(r"[:,'\";<>\\/`~#%^&*()+]", "", filtered_dialog)
-            dialogs.append(filtered_dialog.lower())
+    sentences = list(map(lambda d: d.strip(), sentences))
+    sentences = list(filter(lambda d: d != '', sentences))
 
-    joined_dialogs = ".".join(dialogs)
-    splitted_dialogs = joined_dialogs.split('.')
-    result_dialogs = list(map(lambda d: d.strip(), splitted_dialogs))
-    result_dialogs = list(filter(lambda d: d != '', result_dialogs))
+    return sentences
 
-    return result_dialogs
+
+def get_client_dialogs(dialogs):
+    delimiter_chars = ['?', '!', '.', '\n', 'CLIENT:']
+
+    client_dialogs = []
+
+    for dialog in dialogs:
+        filtered_dialog = dialog
+
+        for char in delimiter_chars:
+            filtered_dialog = filtered_dialog.replace(char, ".")
+
+        filtered_dialog = filtered_dialog.strip()
+        filtered_dialog = re.sub(r"[:,'\";<>\\/`~#%^&*()+]", "", filtered_dialog)
+        client_dialogs.append(filtered_dialog.lower())
+
+    return client_dialogs
 
 
 def get_words_from_sentence(sentence):

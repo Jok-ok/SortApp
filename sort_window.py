@@ -44,7 +44,7 @@ def get_phrases(df):
     global table_window
 
     df_without_header = logic.delete_header_row(df)
-    client_sentences = logic.get_client_sentences(df_without_header, column_index)
+    client_sentences = logic.get_sentences(df_without_header, column_index)
     phrase_count = logic.get_phrase_count_dict(client_sentences, word_count)
     sorted_phrases = logic.sort_phrases(phrase_count, sort_type)
 
@@ -198,7 +198,7 @@ def SortWindow(back_window, df):
     def search_btn_click():
         global table_window
         phrases = get_phrases(df)
-        table_window = TableWindow(phrases)
+        table_window = TableWindow(back_window, phrases)
         table_window.show()
         window.close()
 
@@ -206,6 +206,22 @@ def SortWindow(back_window, df):
 
     btn_search.setFixedSize(QSize(100, 55))
     btn_search.setStyleSheet("background: #27AE61;"
+                             "border-radius: 13%;"
+                             "font-size: 25px;"
+                             "color: #FFF")
+
+    btn_back = QPushButton(window)
+    btn_back.move(870, 515)
+    btn_back.setText("Меню")
+
+    def back_btn_click():
+        start_window.show()
+        window.close()
+
+    btn_back.clicked.connect(back_btn_click)
+
+    btn_back.setFixedSize(QSize(100, 55))
+    btn_back.setStyleSheet("background: #27AE61;"
                              "border-radius: 13%;"
                              "font-size: 25px;"
                              "color: #FFF")
