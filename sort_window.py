@@ -44,7 +44,7 @@ def get_phrases(df):
     global table_window
 
     df_without_header = logic.delete_header_row(df)
-    client_sentences = logic.get_sentences(df_without_header, column_index)
+    client_sentences = logic.get_grouped_sentences(df_without_header, column_index)
     phrase_count = logic.get_phrase_count_dict(client_sentences, word_count)
     sorted_phrases = logic.sort_phrases(phrase_count, sort_type)
 

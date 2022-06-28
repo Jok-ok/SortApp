@@ -12,23 +12,31 @@ def delete_header_row(df):
     return df_without_header_row
 
 
-def get_sentences(df, index):
+def get_grouped_sentences(df, index):
     original_dialogs = df[index].tolist()
     original_dialogs = list(map(lambda d: str(d), original_dialogs))
 
+    grouped_sentences = []
+
+    for dialog in original_dialogs:
+        grouped_sentences.append(get_dialog_sentences(dialog))
+
+    return grouped_sentences
+
+
+def get_dialog_sentences(dialog):
     sentences = []
 
-    for text in original_dialogs:
-        client_dialogs = re.findall(r'CLIENT:(.+?)BOT:', text + "BOT:", re.DOTALL)
+    client_dialogs = re.findall(r'CLIENT:(.+?)BOT:', dialog + "BOT:", re.DOTALL)
 
-        if len(client_dialogs) == 0:
-            sentences.append(text)
-        else:
-            client_dialogs = get_client_dialogs(client_dialogs)
+    if len(client_dialogs) == 0:
+        sentences.append(dialog)
+    else:
+        client_dialogs = get_client_dialogs(client_dialogs)
 
-            for dialog in client_dialogs:
-                client_sentences = dialog.split(".")
-                sentences = sentences + client_sentences
+        for client_dialog in client_dialogs:
+            client_sentences = client_dialog.split(".")
+            sentences = sentences + client_sentences
 
     sentences = list(map(lambda d: d.strip(), sentences))
     sentences = list(filter(lambda d: d != '', sentences))
@@ -59,18 +67,24 @@ def get_words_from_sentence(sentence):
     return list(filter(lambda word: word != '', words))
 
 
-def get_phrase_count_dict(sentences, phrase_word_count):
+def get_phrase_count_dict(grouped_sentences, phrase_word_count):
     phrase_count = {}
 
-    for sentence in sentences:
-        words = get_words_from_sentence(sentence)
+    for group_sentences in grouped_sentences:
+        group_phrases = set()
 
-        for i in range(len(words)):
-            if i + phrase_word_count > len(words):
-                break
+        for sentence in group_sentences:
+            words = get_words_from_sentence(sentence)
 
-            phrase = " ".join(words[i:i + phrase_word_count])
+            for i in range(len(words)):
+                if i + phrase_word_count > len(words):
+                    break
 
+                phrase = " ".join(words[i:i + phrase_word_count])
+
+                group_phrases.add(phrase)
+
+        for phrase in group_phrases:
             if phrase in phrase_count.keys():
                 phrase_count[phrase] = phrase_count[phrase] + 1
             else:
