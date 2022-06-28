@@ -16,7 +16,7 @@ def get_column_names(df):
     header_row = df.loc[0]
 
     for number in df.keys():
-        names.append(chr(number + 65) + ") " + header_row[number])
+        names.append(chr(number + 65) + ") " + str(header_row[number]))
 
     return names
 
