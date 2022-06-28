@@ -19,9 +19,8 @@ def choose_file(window):
     file_dialog.selectNameFilter("XLSX files (*.xlsx)")
 
     filepath = file_dialog.getOpenFileName()[0]
-    print(filepath)
 
-    if filepath:
+    if filepath and filepath.split(".")[-1] == "xlsx":
         df = get_data_from_xlsx(filepath)
         sort_window = SortWindow(window, df)
         sort_window.show()
