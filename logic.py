@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+from itertools import combinations
 
 
 def get_data_from_xlsx():
@@ -67,8 +68,33 @@ def get_words_from_sentence(sentence):
     return list(filter(lambda word: word != '', words))
 
 
-def get_phrase_count_dict(grouped_sentences, phrase_word_count):
-    phrase_count = {}
+def get_outlying_phrases(grouped_sentences, phrase_word_count):
+    # i = 0
+    phrases = []
+    grouped_joined_sentences = []
+
+    for group_sentences in grouped_sentences:
+        grouped_joined_sentences.append(" ".join(group_sentences))
+
+    for sentence in grouped_joined_sentences:
+        # print("-----------------------------------")
+        # i += 1
+        # print("i: " + str(i))
+        # print("len words: " + str(len(get_words_from_sentence(group_sentence))))
+        tuple_phrases = set(combinations(get_words_from_sentence(sentence), phrase_word_count))
+        group_phrases = []
+
+        for phrase in tuple_phrases:
+            str_phrase = " ".join(phrase)
+            group_phrases.append(str_phrase)
+
+        phrases += group_phrases
+
+    return phrases
+
+
+def get_nearby_phrases(grouped_sentences, phrase_word_count):
+    phrases = []
 
     for group_sentences in grouped_sentences:
         group_phrases = set()
@@ -84,11 +110,19 @@ def get_phrase_count_dict(grouped_sentences, phrase_word_count):
 
                 group_phrases.add(phrase)
 
-        for phrase in group_phrases:
-            if phrase in phrase_count.keys():
-                phrase_count[phrase] = phrase_count[phrase] + 1
-            else:
-                phrase_count[phrase] = 1
+        phrases = phrases + list(group_phrases)
+
+    return phrases
+
+
+def get_phrase_count_dict(phrases):
+    phrase_count = {}
+
+    for phrase in phrases:
+        if phrase in phrase_count.keys():
+            phrase_count[phrase] = phrase_count[phrase] + 1
+        else:
+            phrase_count[phrase] = 1
 
     return phrase_count
 
@@ -100,3 +134,5 @@ def sort_phrases(phrase_counts, sort_type="max"):
         reverse = False
 
     return sorted(phrase_counts.items(), key=lambda p: p[1], reverse=reverse)
+
+
