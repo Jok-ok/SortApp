@@ -69,7 +69,6 @@ def get_words_from_sentence(sentence):
 
 
 def get_outlying_phrases(grouped_sentences, phrase_word_count):
-    # i = 0
     phrases = []
     grouped_joined_sentences = []
 
@@ -77,18 +76,18 @@ def get_outlying_phrases(grouped_sentences, phrase_word_count):
         grouped_joined_sentences.append(" ".join(group_sentences))
 
     for sentence in grouped_joined_sentences:
-        # print("-----------------------------------")
-        # i += 1
-        # print("i: " + str(i))
-        # print("len words: " + str(len(get_words_from_sentence(group_sentence))))
-        tuple_phrases = set(combinations(get_words_from_sentence(sentence), phrase_word_count))
+        words = get_words_from_sentence(sentence)
+
         group_phrases = []
 
-        for phrase in tuple_phrases:
-            str_phrase = " ".join(phrase)
-            group_phrases.append(str_phrase)
+        for i in range(len(words)):
+            tuple_phrases = set(combinations(words[i + 1:15], phrase_word_count - 1))
 
-        phrases += group_phrases
+            for phrase in tuple_phrases:
+                str_phrase = " ".join(phrase)
+                group_phrases.append(words[i] + " " + str_phrase)
+
+        phrases += set(group_phrases)
 
     return phrases
 

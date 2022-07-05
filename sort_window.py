@@ -1,7 +1,10 @@
+import threading
+
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QDesktopWidget, QComboBox, QLabel, \
     QSlider, QRadioButton, QCheckBox
 import logic
+from loading_window import LoadingWindow
 from table_window import TableWindow
 
 start_window = None
@@ -225,7 +228,6 @@ def SortWindow(back_window, df):
         "min-height: 30"
         "}")
 
-    # setting check box state to checked
     checkbox.setChecked(True)
 
     checkbox.toggled.connect(set_is_nearby)
@@ -237,10 +239,15 @@ def SortWindow(back_window, df):
 
     def search_btn_click():
         global table_window
-        phrases = get_phrases(df)
-        table_window = TableWindow(back_window, phrases)
-        table_window.show()
+
         window.close()
+        loading = LoadingWindow()
+        loading.show()
+
+        phrases = get_phrases(df)
+
+        table_window = TableWindow(back_window, phrases[:1000])
+        table_window.show()
 
     btn_search.clicked.connect(search_btn_click)
 
