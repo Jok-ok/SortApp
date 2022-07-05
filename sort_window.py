@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QDesktopWidget, QComboBox, QLabel, \
-    QSlider, QRadioButton
+    QSlider, QRadioButton, QCheckBox
 import logic
 from table_window import TableWindow
 
@@ -9,6 +9,7 @@ table_window = None
 word_count = 1
 sort_type = "max"
 column_index = 0
+is_nearby = True
 
 
 def get_column_names(df):
@@ -40,13 +41,23 @@ def set_min_sort_type(status):
         sort_type = "min"
 
 
+def set_is_nearby(status):
+    global is_nearby
+
+    is_nearby = status
+
+
 def get_phrases(df):
     global table_window
 
     df_without_header = logic.delete_header_row(df)
     client_sentences = logic.get_grouped_sentences(df_without_header, column_index)
-    #phrases = logic.get_nearby_phrases(client_sentences, word_count)
-    phrases = logic.get_outlying_phrases(client_sentences, word_count)
+
+    if is_nearby:
+        phrases = logic.get_nearby_phrases(client_sentences, word_count)
+    else:
+        phrases = logic.get_outlying_phrases(client_sentences, word_count)
+
     phrase_count = logic.get_phrase_count_dict(phrases)
     sorted_phrases = logic.sort_phrases(phrase_count, sort_type)
 
@@ -64,7 +75,7 @@ def SortWindow(back_window, df):
     window = QMainWindow()
 
     window.setWindowTitle("Super sort app")
-    window.setFixedSize(QSize(1000, 600))
+    window.setFixedSize(QSize(1000, 650))
     qtRectangle = window.frameGeometry()
     centerPoint = QDesktopWidget().availableGeometry().center()
     qtRectangle.moveCenter(centerPoint)
@@ -193,8 +204,35 @@ def SortWindow(back_window, df):
         "}")
     radiobutton_min.toggled.connect(set_min_sort_type)
 
+    checkbox = QCheckBox('Рядом стоящие', window)
+
+    checkbox.move(310, 470)
+    checkbox.setFixedSize(QSize(300, 30))
+
+    checkbox.setStyleSheet(
+        "QCheckBox {"
+        "font-size: 22px"
+        "}"
+        "QCheckBox::indicator:unchecked {"
+        "border: 3px solid #27AE61;"
+        "min-width: 30;"
+        "min-height: 30"
+        "}"
+        "QCheckBox::indicator:checked"
+        "{"
+        "background: #27AE61;"
+        "min-width: 30;"
+        "min-height: 30"
+        "}")
+
+    # setting check box state to checked
+    checkbox.setChecked(True)
+
+    checkbox.toggled.connect(set_is_nearby)
+
+    # -------------------------------------------------------------------------
     btn_search = QPushButton(window)
-    btn_search.move(450, 470)
+    btn_search.move(450, 540)
     btn_search.setText("Поиск")
 
     def search_btn_click():
@@ -213,7 +251,7 @@ def SortWindow(back_window, df):
                              "color: #FFF")
 
     btn_back = QPushButton(window)
-    btn_back.move(870, 515)
+    btn_back.move(870, 540)
     btn_back.setText("Меню")
 
     def back_btn_click():
@@ -224,8 +262,8 @@ def SortWindow(back_window, df):
 
     btn_back.setFixedSize(QSize(100, 55))
     btn_back.setStyleSheet("background: #27AE61;"
-                             "border-radius: 13%;"
-                             "font-size: 25px;"
-                             "color: #FFF")
+                           "border-radius: 13%;"
+                           "font-size: 25px;"
+                           "color: #FFF")
 
     return window
