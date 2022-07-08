@@ -68,6 +68,10 @@ def get_words_from_sentence(sentence):
     return list(filter(lambda word: word != '', words))
 
 
+def remove_short_words(words, max_short_word_len=4):
+    return list(filter(lambda w: len(w) > max_short_word_len, words))
+
+
 def get_outlying_phrases(grouped_sentences, phrase_word_count):
     phrases = []
     grouped_joined_sentences = []
@@ -76,7 +80,7 @@ def get_outlying_phrases(grouped_sentences, phrase_word_count):
         grouped_joined_sentences.append(" ".join(group_sentences))
 
     for sentence in grouped_joined_sentences:
-        words = get_words_from_sentence(sentence)
+        words = remove_short_words(get_words_from_sentence(sentence))
 
         group_phrases = []
 
