@@ -1,6 +1,6 @@
-import pandas as pd
 import re
 from itertools import combinations
+import pandas as pd
 
 
 def get_data_from_xlsx():
@@ -8,14 +8,14 @@ def get_data_from_xlsx():
     return pd.DataFrame(excel_data)
 
 
-def delete_header_row(df):
-    df_without_header_row = df.drop(df.index[0])
+def delete_header_row(data_frame):
+    df_without_header_row = data_frame.drop(data_frame.index[0])
     return df_without_header_row
 
 
-def get_grouped_sentences(df, index):
-    original_dialogs = df[index].tolist()
-    original_dialogs = list(map(lambda d: str(d), original_dialogs))
+def get_grouped_sentences(data_frame, index):
+    original_dialogs = data_frame[index].tolist()
+    original_dialogs = [str(dialog) for dialog in original_dialogs]
 
     grouped_sentences = []
 
@@ -28,7 +28,8 @@ def get_grouped_sentences(df, index):
 def get_dialog_sentences(dialog):
     sentences = []
 
-    client_dialogs = re.findall(r'CLIENT:(.+?)BOT:', dialog + "BOT:", re.DOTALL)
+    client_dialogs = re.findall(r'CLIENT:(.+?)BOT:',
+                                dialog + "BOT:", re.DOTALL)
 
     if len(client_dialogs) == 0:
         sentences.append(dialog)
@@ -57,7 +58,8 @@ def get_client_dialogs(dialogs):
             filtered_dialog = filtered_dialog.replace(char, ".")
 
         filtered_dialog = filtered_dialog.strip()
-        filtered_dialog = re.sub(r"[:,'\";<>\\/`~#%^&*()+]", "", filtered_dialog)
+        filtered_dialog = re.sub(r"[:,'\";<>\\/`~#%^&*()+]",
+                                 "", filtered_dialog)
         client_dialogs.append(filtered_dialog.lower())
 
     return client_dialogs
@@ -84,12 +86,13 @@ def get_outlying_phrases(grouped_sentences, phrase_word_count):
 
         group_phrases = []
 
-        for i in range(len(words)):
-            tuple_phrases = set(combinations(words[i + 1:15], phrase_word_count - 1))
+        for i, word in enumerate(words):
+            tuple_phrases = set(combinations(words[i + 1:15],
+                                             phrase_word_count - 1))
 
             for phrase in tuple_phrases:
                 str_phrase = " ".join(phrase)
-                group_phrases.append(words[i] + " " + str_phrase)
+                group_phrases.append(word + " " + str_phrase)
 
         phrases += set(group_phrases)
 
@@ -137,5 +140,3 @@ def sort_phrases(phrase_counts, sort_type="max"):
         reverse = False
 
     return sorted(phrase_counts.items(), key=lambda p: p[1], reverse=reverse)
-
-

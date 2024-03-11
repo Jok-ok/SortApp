@@ -6,7 +6,7 @@ from start_window import StartWindow
 def main():
     app = QApplication(sys.argv)
 
-    window = StartWindow()
+    window = StartWindow().create_start_window()
     window.show()
 
     sys.exit(app.exec_())

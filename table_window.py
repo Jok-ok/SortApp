@@ -1,63 +1,62 @@
 from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QTableWidget, QHeaderView,
+                             QTableWidgetItem, QDesktopWidget,
+                             QMainWindow, QPushButton)
 
 
-start_window = None
-row = 1000
-col = 2
+class TableWindow:
+    def __init__(self):
+        self.start_window = None
+        self.row = 1000
+        self.col = 2
 
+    def create_table(self, window, data):
+        table = QTableWidget(window)
+        table.setColumnCount(self.col)
+        table.setRowCount(self.row)
+        table.setHorizontalHeaderLabels(("Phrase", "Number"))
+        table.setMinimumWidth(500)
+        table.setMinimumHeight(800)
+        table.setShowGrid(True)
 
-def create_table(window, data):
-    global row, col
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        table.verticalHeader().hide()
 
-    table = QTableWidget(window)
-    table.setColumnCount(col)
-    table.setRowCount(row)
-    table.setHorizontalHeaderLabels(("Phrase", "Number"))
-    table.setMinimumWidth(500)
-    table.setMinimumHeight(800)
-    table.setShowGrid(True)
+        for i, item in enumerate(data):
+            for j, val in enumerate(item):
+                table.setItem(i, j, QTableWidgetItem(str(val)))
 
-    table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-    table.verticalHeader().hide()
+        table.show()
 
-    for i, item in enumerate(data):
-        for j, val in enumerate(item):
-            table.setItem(i, j, QTableWidgetItem(str(val)))
+    def create_table_window(self, back_window, data):
+        self.start_window = back_window
 
-    table.show()
+        window = QMainWindow()
 
+        window.setWindowTitle("Show Table")
+        window.setFixedSize(QSize(500, 900))
 
-def TableWindow(back_window, data):
-    global start_window
-    start_window = back_window
+        qt_rectangle = window.frameGeometry()
+        center_point = QDesktopWidget().availableGeometry().center()
+        qt_rectangle.moveCenter(center_point)
+        window.move(qt_rectangle.topLeft())
 
-    window = QMainWindow()
+        btn_back = QPushButton(window)
+        btn_back.move(390, 835)
+        btn_back.setText("Меню")
 
-    window.setWindowTitle("Show Table")
-    window.setFixedSize(QSize(500, 900))
+        def back_btn_click():
+            self.start_window.show()
+            window.close()
 
-    qtRectangle = window.frameGeometry()
-    centerPoint = QDesktopWidget().availableGeometry().center()
-    qtRectangle.moveCenter(centerPoint)
-    window.move(qtRectangle.topLeft())
+        btn_back.clicked.connect(back_btn_click)
 
-    btn_back = QPushButton(window)
-    btn_back.move(390, 835)
-    btn_back.setText("Меню")
+        btn_back.setFixedSize(QSize(100, 55))
+        btn_back.setStyleSheet("background: #27AE61;"
+                               "border-radius: 13%;"
+                               "font-size: 25px;"
+                               "color: #FFF")
 
-    def back_btn_click():
-        start_window.show()
-        window.close()
+        self.create_table(window, data)
 
-    btn_back.clicked.connect(back_btn_click)
-
-    btn_back.setFixedSize(QSize(100, 55))
-    btn_back.setStyleSheet("background: #27AE61;"
-                           "border-radius: 13%;"
-                           "font-size: 25px;"
-                           "color: #FFF")
-
-    create_table(window, data)
-
-    return window
+        return window
